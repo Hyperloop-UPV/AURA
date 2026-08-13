@@ -1,0 +1,19 @@
+project:
+  type: default
+
+execute:
+  freeze: auto
+  cache: true
+
+format:
+  pdf:
+    documentclass: article
+    toc: true
+    toc-title: "Tabla de contenidos"
+    number-sections: true
+    colorlinks: true
+    toccolor: black
+    geometry:
+      - a4paper
+      - margin=2.5cm
+    include-in-header: headfoot.tex

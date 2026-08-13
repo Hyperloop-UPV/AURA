@@ -1,0 +1,7 @@
+docs/.quarto/
+docs/*.pdf
+docs/*.aux
+docs/*.log
+docs/*_files/
+docs/*.tex
+!docs/headfoot.tex

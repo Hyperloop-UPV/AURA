@@ -1,0 +1,46 @@
+\usepackage{fancyhdr}
+          \usepackage{graphicx}
+          \graphicspath{{./logos/}{../logos/}}
+          \setlength{\headheight}{30pt}
+          \newcommand{\auraDocTitle}{}
+          \let\auraOrigTitle\title
+          \renewcommand{\title}[1]{\auraOrigTitle{#1}\renewcommand{\auraDocTitle}{#1}}
+          % Si no queda hueco suficiente al final para el icono "curva" sin chocar
+          % con el texto, se añade una página en blanco antes de marcar la última.
+          \AtEndDocument{%
+            \ifdim\pagegoal=\maxdimen\else
+              \ifdim\dimexpr\pagegoal-\pagetotal\relax<6cm
+                \newpage\null % \null fuerza que la página en blanco se genere de verdad
+              \fi
+            \fi
+            \label{auraLastPage}%
+          }
+          \fancypagestyle{plain}{
+            % Limpia cabecera y pie
+            \fancyhf{}
+
+            % --- CABECERA ---
+            \fancyhead[L]{\includegraphics[height=1.3cm]{logo-text.png}} % logo completo izquierda
+            \fancyhead[C]{AURA}
+            \fancyhead[R]{\includegraphics[height=1.3cm]{SW.png}} % logo SW derecha
+
+            % --- PIE DE PÁGINA ---
+            \fancyfoot[L]{\small {\hypersetup{urlcolor=black}\href{https://ribal.dev}{Javier Ribal del Río}}}
+            \fancyfoot[C]{\small \auraDocTitle}
+            \fancyfoot[R]{\small \thepage} % número de página
+
+            % --- Estilo de líneas ---
+            \renewcommand{\headrulewidth}{0.4pt} % línea bajo la cabecera
+            \renewcommand{\footrulewidth}{0.4pt} % línea sobre el pie
+
+            % Icono "curva" centrado, justo encima de la línea del pie, solo en la última página
+            \renewcommand{\footrule}{%
+              \ifnum\value{page}=\getpagerefnumber{auraLastPage}%
+                \smash{\raisebox{0.5cm}{\makebox[\headwidth][c]{\includegraphics[height=5cm]{curva.png}}}}%
+              \fi
+              \hrule height\footrulewidth width\headwidth
+            }
+          }
+
+          % Aplica el estilo a todas las páginas
+          \pagestyle{plain}

@@ -1,0 +1,9 @@
+---
+title: "Título del documento"
+author: "Nombre del autor"
+date: today
+---
+
+## Sección
+
+Contenido del documento.
