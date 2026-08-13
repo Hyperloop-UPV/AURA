@@ -1,0 +1,179 @@
+---
+title: "Máquina de Estados"
+author: "Javier Ribal del Río"
+date: today
+---
+
+## Introducción
+
+AURA organiza toda la información de patrocinio en torno a tres conceptos:
+
+- **Organization**: la empresa (p. ej. DHL, Siemens). Es una entidad permanente que no
+  cambia de temporada a temporada (*cada temporada se corresponde con H10, H11...*).
+- **Contacto**: una persona asociada a una Organization (p. ej. un responsable de RSC en
+  DHL). Los contactos pueden cambiar con el tiempo, pero la Organization permanece.
+- **Deal**: la relación de patrocinio de una Organization durante **una temporada concreta**
+  (p. ej. "DHL 2025/26"). Toda la información que depende de la temporada — estado,
+  categoría de patrocinio, contribuciones — vive en el Deal, no en la Organization.
+
+Cada Deal avanza a través de una **máquina de estados** que representa en qué punto se
+encuentra la relación de patrocinio con esa empresa durante esa temporada. Esta máquina de
+estados es el mecanismo central que usa AURA para saber, en cualquier momento, qué está
+pasando con cada patrocinador y qué acción toca a continuación.
+
+| AURA | Sistema actual |
+|---|---|
+| Organization | Hoja de cálculo de patrocinios |
+| Contacto | Hoja de cálculo de correos |
+| Deal | Hoja de cálculo de patrocinios |
+
+: Equivalencia entre sistema actual y AURA {#tbl-equivalencia}
+
+## Máquina de estados
+
+El flujo principal de patrocinio recorre cinco estados, desde el primer contacto hasta la
+renovación:
+
+**Potencial → Contacto → Negociación → Partner → En renovación**, y de ahí de vuelta a
+**Contacto** para la siguiente temporada.
+
+Además, existen tres estados fuera de este flujo (**Inactivo**, **Sin respuesta**, **No
+Partner**) a los que puede pasar la relación cuando no progresa como se esperaba. Desde
+**Inactivo** es posible reactivar el contacto y volver a entrar en el flujo principal.
+
+```{mermaid}
+%%| fig-width: 6
+
+%%{init: {
+  "flowchart": {
+    "defaultRenderer": "elk",
+    "curve": "basis",
+    "diagramPadding": 20
+  },
+  "theme": "base"
+}}%%
+
+flowchart TB
+
+    subgraph FLUJO["Flujo de patrocinio"]
+        direction LR
+
+        P["Potencial"]
+        C["Contacto"]
+        N["Negociación"]
+        PA["Partner"]
+        R["En renovación"]
+
+        P -->|"Se realiza el contacto"| C
+        C -->|"Respuesta positiva"| N
+        N -->|"Se materializa el acuerdo"| PA
+
+        PA -->|"Fin de temporada"| R
+        R -->|"Se retoma el contacto"| C
+    end
+
+
+    subgraph NO["No patrocinio"]
+        direction LR
+
+        I["Inactivo"]
+        SR["Sin respuesta"]
+        NP["No Partner"]
+
+        I ~~~ SR
+        SR ~~~ NP
+    end
+
+
+    %% Salidas hacia No patrocinio
+    C -.-> NO
+    N -.-> NO
+    PA -.-> NO
+
+    %% Reactivación
+    I -->|"Se reactiva el contacto"| C
+
+
+    %% =========================
+    %% ESTILOS
+    %% =========================
+
+    style FLUJO fill:#FFFDEB,stroke:#C7C76A,stroke-width:1px
+    style NO fill:#FFFDEB,stroke:#C7C76A,stroke-width:1px
+
+    style P fill:#4CAF50,stroke:#2E7D32,color:#FFFFFF,stroke-width:2px
+    style C fill:#2196F3,stroke:#1565C0,color:#FFFFFF,stroke-width:2px
+    style N fill:#FF9800,stroke:#E65100,color:#FFFFFF,stroke-width:2px
+    style PA fill:#9C27B0,stroke:#6A1B9A,color:#FFFFFF,stroke-width:2px
+    style R fill:#00ACC1,stroke:#00838F,color:#FFFFFF,stroke-width:2px
+
+    style I fill:#607D8B,stroke:#37474F,color:#FFFFFF,stroke-width:2px
+    style SR fill:#F44336,stroke:#C62828,color:#FFFFFF,stroke-width:2px
+    style NP fill:#795548,stroke:#4E342E,color:#FFFFFF,stroke-width:2px
+
+    %% Las tres flechas rojas
+    linkStyle 7,8,9 stroke:#FF5252,stroke-width:2px,stroke-dasharray:5 5
+```
+
+Cada transición representa un evento concreto (p. ej. "se realiza el contacto" o "se
+materializa el acuerdo"), no un simple cambio manual de estado. Esto permite que el estado de
+un Deal siempre refleje el motivo real por el que avanzó o se detuvo la relación con esa
+empresa.
+
+## Descripción de los estados
+
+La máquina de estados representa el ciclo de relación con un posible patrocinador a lo largo
+de una temporada. Una empresa comienza como **Potencial**, pasa a **Contacto** cuando se
+inicia la comunicación, entra en **Negociación** si existe interés y se convierte en
+**Partner** cuando el acuerdo se materializa.
+
+Al finalizar la temporada, un **Partner** pasa a **En renovación**, desde donde se retoma el
+contacto para valorar la continuidad. En cualquier momento, una relación puede salir del flujo
+principal hacia alguno de los estados de **No patrocinio**: **Inactivo**, **Sin respuesta** o
+**No Partner**. Además, un estado **Inactivo** puede volver a **Contacto** si la relación se
+reactiva.
+
+### Potencial
+
+- Empresa identificada como posible patrocinador, con la que aún no se ha iniciado ningún
+  contacto.
+
+### Contacto
+
+- Se ha establecido comunicación con la empresa y se está a la espera de una respuesta o de
+  avanzar la conversación.
+
+
+### Negociación
+
+- La empresa ha mostrado interés y se están definiendo los términos concretos del acuerdo de
+  patrocinio.
+- Se pasa a este estado tras recibir la contestación positiva.
+
+### Partner
+
+- El acuerdo de patrocinio se ha materializado; la empresa es patrocinador activo durante la
+  temporada en curso.
+- Aquí también irían incluidas aquellas empresas con las que tenemos patrocinio pero no llegamos a usar.
+
+### En renovación
+
+- La temporada ha finalizado y se está evaluando la continuidad del patrocinio de cara a la
+  siguiente temporada.
+
+### Inactivo
+
+- La relación se ha detenido sin llegar a un rechazo explícito. Puede reactivarse en cualquier
+  momento volviendo a **Contacto**.
+- Por ejemplo, las empresas que tras la DANA nos dijeron que no podrían colaborar pero que les
+  escribiéramos el año próximo.
+
+### Sin respuesta
+
+- Se intentó contacto o negociación, pero la empresa dejó de responder.
+
+### No Partner
+
+- La empresa ha rechazado explícitamente el patrocinio o el acuerdo no se ha materializado.
+- Aquí también irían aquellas que no se ha llegado a terminar la negociación, este año por
+  ejemplo la empresa logística *Ontime* iría en este grupo.

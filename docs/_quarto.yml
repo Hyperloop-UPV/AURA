@@ -17,3 +17,7 @@ format:
       - a4paper
       - margin=2.5cm
     include-in-header: headfoot.tex
+    header-includes:
+      - |
+        \let\oldtableofcontents\tableofcontents
+        \renewcommand{\tableofcontents}{\oldtableofcontents\vspace{1.5cm}}
