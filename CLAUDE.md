@@ -259,7 +259,7 @@ Prefer:
 Organization → Link to CRM Organization
 ```
 
-over storing `"Bosch"` as text.
+over storing `"DHL"` as text.
 
 Avoid duplicating data across Organization and Deal unless there is a deliberate
 denormalization strategy.

@@ -15,7 +15,7 @@ concepts, workflow, and data shapes AURA is built around.
 Examples:
 
 ```text
-Bosch
+DHL
 Siemens
 Mouser
 Analog Devices
@@ -36,7 +36,7 @@ history.
 Example:
 
 ```text
-Organization: Bosch
+Organization: DHL
 
 Contacts:
 - Juan García
@@ -53,12 +53,12 @@ season**.
 Example:
 
 ```text
-Organization: Bosch
+Organization: DHL
 
 Deals:
-- Bosch 2024/25
-- Bosch 2025/26
-- Bosch 2026/27
+- DHL 2024/25
+- DHL 2025/26
+- DHL 2026/27
 ```
 
 This differs slightly from the usual sales meaning of Deal.
@@ -254,15 +254,15 @@ This enables reliable filtering and historical analysis.
 Example:
 
 ```text
-Bosch 2024/25
+DHL 2024/25
 Status: Partner
 Tier: Collaborator
 
-Bosch 2025/26
+DHL 2025/26
 Status: Partner
 Tier: Pro
 
-Bosch 2026/27
+DHL 2026/27
 Status: Negociación
 Tier: Pro
 ```
@@ -348,11 +348,11 @@ notes
 Examples:
 
 ```text
-Bosch | 2024/25 | María
-Bosch | 2025/26 | Carlos
-Bosch | 2025/26 | Pedro
-Bosch | 2026/27 | Javier
-Bosch | 2026/27 | Laura
+DHL | 2024/25 | María
+DHL | 2025/26 | Carlos
+DHL | 2025/26 | Pedro
+DHL | 2026/27 | Javier
+DHL | 2026/27 | Laura
 ```
 
 Historical assignments are a central part of AURA, not optional metadata.
@@ -366,7 +366,7 @@ This is a core product requirement.
 The Organization page should eventually provide an aggregated historical view such as:
 
 ```text
-BOSCH
+DHL
 ════════════════════════════════════
 
 CURRENT
