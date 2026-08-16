@@ -91,11 +91,13 @@ Como punto de partida para el catálogo de `Sector` mantenido por el `Admin`, se
 * Electromagnetics
 * Electrónica
 * Empresas Locales
-* Equipaciones + Merchandising
-* Fibra + Hormigón
+* Equipaciones 
+* Merchandising
+* Materiales (*Carenado*, *Fibra*)
 * Líquido
 * Logística
-* Mecanizados + Impresión 3D
+* Mecanizados
+* Impresión 3D
 * Miscelánea
 
 ## Contact
