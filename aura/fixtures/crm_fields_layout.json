@@ -39,8 +39,8 @@
   "docstatus": 0,
   "doctype": "CRM Fields Layout",
   "dt": "Contact",
-  "layout": "[{\"label\": \"Details\", \"name\": \"details_section\", \"opened\": true, \"columns\": [{\"name\": \"column_eIWl\", \"fields\": [\"salutation\", \"first_name\", \"last_name\", \"email_id\", \"mobile_no\", \"gender\", \"company_name\", \"designation\", \"address\"]}]}]",
-  "modified": "2026-08-17 21:41:36.690133",
+  "layout": "[{\"label\":\"Details\",\"name\":\"details_section\",\"opened\":true,\"columns\":[{\"name\":\"column_eIWl\",\"fields\":[\"first_name\",\"last_name\",\"gender\",\"company_name\",\"department\",\"email_id\",\"mobile_no\"]}],\"showEditButton\":true,\"visible\":7}]",
+  "modified": "2026-08-19 19:22:11.256992",
   "name": "Contact-Side Panel",
   "type": "Side Panel"
  },
