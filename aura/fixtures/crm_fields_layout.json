@@ -11,6 +11,24 @@
  {
   "docstatus": 0,
   "doctype": "CRM Fields Layout",
+  "dt": "Contact",
+  "layout": "[{\"name\":\"first_tab\",\"sections\":[{\"name\":\"full_name_section\",\"hideBorder\":true,\"columns\":[{\"name\":\"column_cSxf\",\"fields\":[\"first_name\"]},{\"name\":\"column_yBc7\",\"fields\":[\"last_name\"]}]},{\"name\":\"email_section\",\"hideBorder\":true,\"columns\":[{\"name\":\"column_tH3L\",\"fields\":[\"email_id\"]}]},{\"name\":\"mobile_gender_section\",\"hideBorder\":true,\"columns\":[{\"name\":\"column_lrfI\",\"fields\":[\"mobile_no\"]},{\"name\":\"column_Tx3n\",\"fields\":[\"gender\"]}]},{\"name\":\"organization_section\",\"hideBorder\":true,\"columns\":[{\"name\":\"column_S0J8\",\"fields\":[\"company_name\"]}]},{\"name\":\"designation_section\",\"hideBorder\":true,\"columns\":[{\"name\":\"column_bsO8\",\"fields\":[\"department\"]}]}]}]",
+  "modified": "2026-08-19 19:00:06.925682",
+  "name": "Contact-Quick Entry",
+  "type": "Quick Entry"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "CRM Fields Layout",
+  "dt": "CRM Organization",
+  "layout": "[{\"name\": \"organization_section\", \"columns\": [{\"name\": \"column_zOuv\", \"fields\": [\"organization_name\"]}]}, {\"name\": \"website_revenue_section\", \"hideBorder\": true, \"columns\": [{\"name\": \"column_I5Dy\", \"fields\": [\"website\"]}, {\"name\": \"column_Rgss\", \"fields\": [\"annual_revenue\"]}]}, {\"name\": \"territory_section\", \"hideBorder\": true, \"columns\": [{\"name\": \"column_w6ap\", \"fields\": [\"territory\"]}]}, {\"name\": \"employee_industry_section\", \"hideBorder\": true, \"columns\": [{\"name\": \"column_u5tZ\", \"fields\": [\"no_of_employees\"]}, {\"name\": \"column_FFrT\", \"fields\": [\"industry\"]}]}, {\"name\": \"address_section\", \"hideBorder\": true, \"columns\": [{\"name\": \"column_O2dk\", \"fields\": [\"address\"]}]}]",
+  "modified": "2026-08-17 21:41:36.673264",
+  "name": "CRM Organization-Quick Entry",
+  "type": "Quick Entry"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "CRM Fields Layout",
   "dt": "CRM Deal",
   "layout": "[{\"label\": \"Contacts\", \"name\": \"contacts_section\", \"opened\": true, \"editable\": false, \"contacts\": []}, {\"name\": \"lost_reason_section\", \"label\": \"Lost Reason\", \"opened\": true, \"columns\": [{\"name\": \"lost_reason_column\", \"fields\": [\"lost_reason\", \"lost_notes\"]}]}, {\"label\": \"Organization Details\", \"name\": \"organization_section\", \"opened\": true, \"columns\": [{\"name\": \"column_na2Q\", \"fields\": [\"organization\", \"website\", \"territory\", \"annual_revenue\", \"closed_date\", \"probability\", \"next_step\", \"deal_owner\"]}]}]",
   "modified": "2026-08-17 18:57:20.019096",
@@ -20,9 +38,27 @@
  {
   "docstatus": 0,
   "doctype": "CRM Fields Layout",
+  "dt": "Contact",
+  "layout": "[{\"label\": \"Details\", \"name\": \"details_section\", \"opened\": true, \"columns\": [{\"name\": \"column_eIWl\", \"fields\": [\"salutation\", \"first_name\", \"last_name\", \"email_id\", \"mobile_no\", \"gender\", \"company_name\", \"designation\", \"address\"]}]}]",
+  "modified": "2026-08-17 21:41:36.690133",
+  "name": "Contact-Side Panel",
+  "type": "Side Panel"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "CRM Fields Layout",
+  "dt": "CRM Organization",
+  "layout": "[{\"label\": \"Details\", \"name\": \"details_section\", \"opened\": true, \"columns\": [{\"name\": \"column_IJOV\", \"fields\": [\"organization_name\", \"website\", \"territory\", \"industry\", \"no_of_employees\", \"address\"]}]}]",
+  "modified": "2026-08-17 21:41:36.692046",
+  "name": "CRM Organization-Side Panel",
+  "type": "Side Panel"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "CRM Fields Layout",
   "dt": "CRM Deal",
-  "layout": "[{\"name\":\"first_tab\",\"sections\":[{\"label\":\"Details\",\"name\":\"details_section\",\"opened\":true,\"columns\":[{\"name\":\"column_z9XL\",\"fields\":[\"organization\",\"annual_revenue\",\"next_step\"]},{\"name\":\"column_gM4w\",\"fields\":[\"website\",\"closed_date\",\"deal_owner\"]},{\"name\":\"column_gWmE\",\"fields\":[\"territory\",\"probability\"]}]},{\"label\":\"Products\",\"name\":\"section_jHhQ\",\"opened\":true,\"columns\":[{\"name\":\"column_xiNF\",\"fields\":[\"products\"]}],\"editingLabel\":false,\"hideLabel\":true},{\"label\":\"New Section\",\"name\":\"section_WNOQ\",\"opened\":true,\"columns\":[{\"name\":\"column_ziBW\",\"fields\":[\"total\"]},{\"label\":\"\",\"name\":\"column_wuwA\",\"fields\":[\"net_total\"]}],\"hideBorder\":true,\"hideLabel\":true}]}]",
-  "modified": "2026-08-17 21:41:36.696190",
+  "layout": "[{\"name\":\"first_tab\",\"sections\":[{\"label\":\"Details\",\"name\":\"details_section\",\"opened\":true,\"columns\":[{\"name\":\"column_z9XL\",\"fields\":[\"organization\",\"annual_revenue\",\"next_step\"]},{\"name\":\"column_gM4w\",\"fields\":[\"website\",\"closed_date\",\"deal_owner\"]},{\"name\":\"column_gWmE\",\"fields\":[\"territory\",\"probability\",\"custom_season\"]}]},{\"label\":\"Products\",\"name\":\"section_jHhQ\",\"opened\":true,\"columns\":[{\"name\":\"column_xiNF\",\"fields\":[\"products\"]}],\"editingLabel\":false,\"hideLabel\":true},{\"label\":\"New Section\",\"name\":\"section_WNOQ\",\"opened\":true,\"columns\":[{\"name\":\"column_ziBW\",\"fields\":[\"total\"]},{\"label\":\"\",\"name\":\"column_wuwA\",\"fields\":[\"net_total\"]}],\"hideBorder\":true,\"hideLabel\":true}]}]",
+  "modified": "2026-08-19 18:56:27.278930",
   "name": "CRM Deal-Data Fields",
   "type": "Data Fields"
  }

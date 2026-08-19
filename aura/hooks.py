@@ -266,7 +266,7 @@ fixtures = [
     {
         "dt": "CRM Fields Layout",
         "filters": [
-            ["dt", "=", "CRM Deal"]
+            ["dt", "in", ["CRM Deal", "CRM Organization", "Contact"]]
         ],
     },
 ]
