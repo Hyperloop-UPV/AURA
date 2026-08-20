@@ -1,0 +1,37 @@
+{
+ "actions": [],
+ "allow_bulk_edit": 1,
+ "allow_rename": 1,
+ "creation": "2026-08-20 22:53:22.830675",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "sector"
+ ],
+ "fields": [
+  {
+   "fieldname": "sector",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Sector",
+   "options": "Sector",
+   "reqd": 1
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2026-08-20 22:54:34.476950",
+ "modified_by": "Administrator",
+ "module": "AURA",
+ "name": "Organization Sector",
+ "owner": "Administrator",
+ "permissions": [],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": []
+}

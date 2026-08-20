@@ -21,8 +21,8 @@
   "docstatus": 0,
   "doctype": "CRM Fields Layout",
   "dt": "CRM Organization",
-  "layout": "[{\"name\":\"first_tab\",\"sections\":[{\"name\":\"organization_section\",\"columns\":[{\"name\":\"column_zOuv\",\"fields\":[\"organization_name\"]}]},{\"name\":\"website_revenue_section\",\"hideBorder\":true,\"columns\":[{\"name\":\"column_I5Dy\",\"fields\":[\"website\",\"custom_upv\"]},{\"name\":\"column_Rgss\",\"fields\":[\"custom_nif\"]}]},{\"name\":\"address_section\",\"hideBorder\":true,\"columns\":[{\"name\":\"column_O2dk\",\"fields\":[\"custom_country\",\"address\"]}]},{\"label\":\"\",\"name\":\"section_howJ\",\"opened\":true,\"columns\":[{\"name\":\"column_yQZQ\",\"fields\":[\"organization_logo\",\"custom_observations\"]}]}]}]",
-  "modified": "2026-08-19 20:59:24.190671",
+  "layout": "[{\"name\":\"first_tab\",\"sections\":[{\"name\":\"organization_section\",\"columns\":[{\"name\":\"column_zOuv\",\"fields\":[\"organization_name\"]},{\"label\":\"\",\"name\":\"column_LlpS\",\"fields\":[\"organization_logo\"]}]},{\"name\":\"website_revenue_section\",\"hideBorder\":true,\"columns\":[{\"name\":\"column_I5Dy\",\"fields\":[\"website\",\"custom_nif\",\"custom_upv\"]},{\"name\":\"column_Rgss\",\"fields\":[\"custom_sector\",\"custom_speciality\"]}]},{\"name\":\"address_section\",\"hideBorder\":true,\"columns\":[{\"name\":\"column_O2dk\",\"fields\":[\"custom_country\",\"address\"]}]},{\"label\":\"\",\"name\":\"section_howJ\",\"opened\":true,\"columns\":[{\"name\":\"column_yQZQ\",\"fields\":[\"custom_observations\"]}]}]}]",
+  "modified": "2026-08-20 23:46:37.025703",
   "name": "CRM Organization-Quick Entry",
   "type": "Quick Entry"
  },
@@ -48,8 +48,8 @@
   "docstatus": 0,
   "doctype": "CRM Fields Layout",
   "dt": "CRM Organization",
-  "layout": "[{\"label\":\"Details\",\"name\":\"details_section\",\"opened\":true,\"columns\":[{\"name\":\"column_IJOV\",\"fields\":[\"organization_name\",\"website\",\"custom_nif\",\"custom_country\",\"address\",\"custom_upv\",\"custom_observations\"]}]}]",
-  "modified": "2026-08-19 21:02:26.611279",
+  "layout": "[{\"label\":\"Details\",\"name\":\"details_section\",\"opened\":true,\"columns\":[{\"name\":\"column_IJOV\",\"fields\":[\"organization_name\",\"custom_sector\",\"custom_speciality\",\"website\",\"custom_nif\",\"custom_country\",\"address\",\"custom_upv\",\"custom_observations\"]}]}]",
+  "modified": "2026-08-20 23:46:57.292721",
   "name": "CRM Organization-Side Panel",
   "type": "Side Panel"
  },
