@@ -1,0 +1,67 @@
+{
+ "actions": [],
+ "allow_bulk_edit": 1,
+ "allow_rename": 1,
+ "creation": "2026-08-21 18:24:50.660467",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "title_template",
+  "description_template",
+  "section_break_fefn",
+  "priority",
+  "column_break_ihec",
+  "due_date"
+ ],
+ "fields": [
+  {
+   "fieldname": "title_template",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Title Template",
+   "reqd": 1
+  },
+  {
+   "fieldname": "description_template",
+   "fieldtype": "Small Text",
+   "label": "Description Template"
+  },
+  {
+   "fieldname": "section_break_fefn",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "priority",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Priority",
+   "options": "Low\nMedium\nHigh"
+  },
+  {
+   "fieldname": "column_break_ihec",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "due_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Due Date"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2026-08-21 18:38:10.298703",
+ "modified_by": "Administrator",
+ "module": "AURA",
+ "name": "Partner Tier Task Template",
+ "owner": "Administrator",
+ "permissions": [],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": []
+}
