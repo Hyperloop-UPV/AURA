@@ -29,6 +29,15 @@
  {
   "docstatus": 0,
   "doctype": "CRM Fields Layout",
+  "dt": "CRM Call Log",
+  "layout": "[{\"name\":\"first_tab\",\"sections\":[{\"name\":\"details_section\",\"columns\":[{\"name\":\"column_uMSG\",\"fields\":[\"type\",\"medium\",\"status\"]},{\"name\":\"column_wiZT\",\"fields\":[\"custom_agent\",\"custom_contact\",\"note\"]}]},{\"label\":\"\",\"name\":\"section_eqCQ\",\"opened\":true,\"columns\":[{\"name\":\"column_vPex\",\"fields\":[\"start_time\",\"end_time\"]},{\"label\":\"\",\"name\":\"column_Gnki\",\"fields\":[\"duration\"]}]},{\"label\":\"\",\"name\":\"section_nyPi\",\"opened\":true,\"columns\":[{\"name\":\"column_leuK\",\"fields\":[]}]}]}]",
+  "modified": "2026-08-22 16:08:15.915742",
+  "name": "CRM Call Log-Quick Entry",
+  "type": "Quick Entry"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "CRM Fields Layout",
   "dt": "CRM Task",
   "layout": "[{\"name\":\"first_tab\",\"sections\":[{\"name\":\"details_section\",\"columns\":[{\"name\":\"column_X9sG\",\"fields\":[\"title\",\"description\"]}]},{\"name\":\"assignment_section\",\"columns\":[{\"name\":\"column_9XjK\",\"fields\":[\"priority\",\"due_date\",\"custom_ventaja_partner\"]},{\"name\":\"column_7s8n\",\"fields\":[\"assigned_to\",\"status\"]}],\"hideBorder\":true}]}]",
   "modified": "2026-08-22 11:13:52.881284",

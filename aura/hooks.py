@@ -272,7 +272,7 @@ fixtures = [
     {
         "dt": "CRM Fields Layout",
         "filters": [
-            ["dt", "in", ["CRM Deal", "CRM Organization", "Contact", "CRM Task","CRM Products",]]
+            ["dt", "in", ["CRM Deal", "CRM Organization", "Contact", "CRM Task","CRM Products", "CRM Call Log"]]
         ],
     },
     {
