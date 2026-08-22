@@ -269,4 +269,10 @@ fixtures = [
             ["dt", "in", ["CRM Deal", "CRM Organization", "Contact", "CRM Task"]]
         ],
     },
+    {
+        "dt": "CRM Form Script",
+        "filters": [
+            ["name", "=", "AURA - Generar ventajas"]
+        ],
+    },
 ]

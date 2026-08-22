@@ -29,6 +29,15 @@
  {
   "docstatus": 0,
   "doctype": "CRM Fields Layout",
+  "dt": "CRM Task",
+  "layout": "[{\"name\":\"first_tab\",\"sections\":[{\"name\":\"details_section\",\"columns\":[{\"name\":\"column_X9sG\",\"fields\":[\"title\",\"description\"]}]},{\"name\":\"assignment_section\",\"columns\":[{\"name\":\"column_9XjK\",\"fields\":[\"priority\",\"due_date\",\"custom_ventaja_partner\"]},{\"name\":\"column_7s8n\",\"fields\":[\"assigned_to\",\"status\"]}],\"hideBorder\":true}]}]",
+  "modified": "2026-08-22 11:13:52.881284",
+  "name": "CRM Task-Quick Entry",
+  "type": "Quick Entry"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "CRM Fields Layout",
   "dt": "CRM Deal",
   "layout": "[{\"label\": \"Contacts\", \"name\": \"contacts_section\", \"opened\": true, \"editable\": false, \"contacts\": []}, {\"name\": \"lost_reason_section\", \"label\": \"Lost Reason\", \"opened\": true, \"columns\": [{\"name\": \"lost_reason_column\", \"fields\": [\"lost_reason\", \"lost_notes\"]}]}, {\"label\": \"Organization Details\", \"name\": \"organization_section\", \"opened\": true, \"columns\": [{\"name\": \"column_na2Q\", \"fields\": [\"organization\", \"website\", \"territory\", \"annual_revenue\", \"closed_date\", \"probability\", \"next_step\", \"deal_owner\"]}]}]",
   "modified": "2026-08-17 18:57:20.019096",
@@ -57,8 +66,8 @@
   "docstatus": 0,
   "doctype": "CRM Fields Layout",
   "dt": "CRM Deal",
-  "layout": "[{\"name\":\"first_tab\",\"sections\":[{\"label\":\"Details\",\"name\":\"details_section\",\"opened\":true,\"columns\":[{\"name\":\"column_z9XL\",\"fields\":[\"organization\",\"annual_revenue\",\"next_step\"]},{\"name\":\"column_gM4w\",\"fields\":[\"website\",\"closed_date\",\"deal_owner\"]},{\"name\":\"column_gWmE\",\"fields\":[\"territory\",\"probability\",\"custom_season\"]}]},{\"label\":\"Products\",\"name\":\"section_jHhQ\",\"opened\":true,\"columns\":[{\"name\":\"column_xiNF\",\"fields\":[\"products\"]}],\"editingLabel\":false,\"hideLabel\":true},{\"label\":\"New Section\",\"name\":\"section_WNOQ\",\"opened\":true,\"columns\":[{\"name\":\"column_ziBW\",\"fields\":[\"total\"]},{\"label\":\"\",\"name\":\"column_wuwA\",\"fields\":[\"net_total\"]}],\"hideBorder\":true,\"hideLabel\":true}]}]",
-  "modified": "2026-08-19 18:56:27.278930",
+  "layout": "[{\"name\":\"first_tab\",\"sections\":[{\"label\":\"Details\",\"name\":\"details_section\",\"opened\":true,\"columns\":[{\"name\":\"column_z9XL\",\"fields\":[\"organization\",\"closed_date\"]},{\"name\":\"column_gM4w\",\"fields\":[\"deal_owner\",\"custom_season\",\"custom_partner_tier\"]},{\"name\":\"column_gWmE\",\"fields\":[]}]},{\"label\":\"Products\",\"name\":\"section_jHhQ\",\"opened\":true,\"columns\":[{\"name\":\"column_xiNF\",\"fields\":[\"products\"]}],\"editingLabel\":false,\"hideLabel\":true},{\"label\":\"New Section\",\"name\":\"section_WNOQ\",\"opened\":true,\"columns\":[{\"name\":\"column_ziBW\",\"fields\":[\"total\"]},{\"label\":\"\",\"name\":\"column_wuwA\",\"fields\":[\"net_total\"]}],\"hideBorder\":true,\"hideLabel\":true}]}]",
+  "modified": "2026-08-21 18:51:36.461981",
   "name": "CRM Deal-Data Fields",
   "type": "Data Fields"
  }
