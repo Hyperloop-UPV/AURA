@@ -48,8 +48,8 @@
   "docstatus": 0,
   "doctype": "CRM Fields Layout",
   "dt": "CRM Deal",
-  "layout": "[{\"label\": \"Contacts\", \"name\": \"contacts_section\", \"opened\": true, \"editable\": false, \"contacts\": []}, {\"name\": \"lost_reason_section\", \"label\": \"Lost Reason\", \"opened\": true, \"columns\": [{\"name\": \"lost_reason_column\", \"fields\": [\"lost_reason\", \"lost_notes\"]}]}, {\"label\": \"Organization Details\", \"name\": \"organization_section\", \"opened\": true, \"columns\": [{\"name\": \"column_na2Q\", \"fields\": [\"organization\", \"website\", \"territory\", \"annual_revenue\", \"closed_date\", \"probability\", \"next_step\", \"deal_owner\"]}]}]",
-  "modified": "2026-08-17 18:57:20.019096",
+  "layout": "[{\"label\":\"Deal Details\",\"name\":\"organization_section\",\"opened\":true,\"columns\":[{\"name\":\"column_na2Q\",\"fields\":[\"organization\",\"closed_date\",\"status\",\"custom_partner_tier\",\"custom_season\"]}],\"editingLabel\":false},{\"label\":\"Contacts\",\"name\":\"contacts_section\",\"opened\":true,\"editable\":false,\"contacts\":[]}]",
+  "modified": "2026-08-22 17:00:54.615886",
   "name": "CRM Deal-Side Panel",
   "type": "Side Panel"
  },
