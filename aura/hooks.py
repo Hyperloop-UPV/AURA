@@ -266,7 +266,7 @@ fixtures = [
     {
         "dt": "Property Setter",
         "filters": [
-            ["doc_type", "in", ["CRM Products"]]
+            ["doc_type", "in", ["CRM Products","CRM Deal",]]
         ],
     },
     {
