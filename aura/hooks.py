@@ -264,9 +264,15 @@ fixtures = [
         ],
     },
     {
+        "dt": "Property Setter",
+        "filters": [
+            ["doc_type", "in", ["CRM Products"]]
+        ],
+    },
+    {
         "dt": "CRM Fields Layout",
         "filters": [
-            ["dt", "in", ["CRM Deal", "CRM Organization", "Contact", "CRM Task"]]
+            ["dt", "in", ["CRM Deal", "CRM Organization", "Contact", "CRM Task","CRM Products",]]
         ],
     },
     {

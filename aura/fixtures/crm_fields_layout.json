@@ -66,8 +66,8 @@
   "docstatus": 0,
   "doctype": "CRM Fields Layout",
   "dt": "CRM Deal",
-  "layout": "[{\"name\":\"first_tab\",\"sections\":[{\"label\":\"Details\",\"name\":\"details_section\",\"opened\":true,\"columns\":[{\"name\":\"column_z9XL\",\"fields\":[\"organization\",\"closed_date\"]},{\"name\":\"column_gM4w\",\"fields\":[\"deal_owner\",\"custom_season\",\"custom_partner_tier\"]},{\"name\":\"column_gWmE\",\"fields\":[]}]},{\"label\":\"Products\",\"name\":\"section_jHhQ\",\"opened\":true,\"columns\":[{\"name\":\"column_xiNF\",\"fields\":[\"products\"]}],\"editingLabel\":false,\"hideLabel\":true},{\"label\":\"New Section\",\"name\":\"section_WNOQ\",\"opened\":true,\"columns\":[{\"name\":\"column_ziBW\",\"fields\":[\"total\"]},{\"label\":\"\",\"name\":\"column_wuwA\",\"fields\":[\"net_total\"]}],\"hideBorder\":true,\"hideLabel\":true}]}]",
-  "modified": "2026-08-21 18:51:36.461981",
+  "layout": "[{\"name\":\"first_tab\",\"sections\":[{\"label\":\"Details\",\"name\":\"details_section\",\"opened\":true,\"columns\":[{\"name\":\"column_z9XL\",\"fields\":[\"organization\",\"custom_season\"]},{\"name\":\"column_gM4w\",\"fields\":[\"deal_owner\"]},{\"name\":\"column_gWmE\",\"fields\":[\"custom_partner_tier\",\"closed_date\"]}]},{\"label\":\"Products\",\"name\":\"section_jHhQ\",\"opened\":true,\"columns\":[{\"name\":\"column_xiNF\",\"fields\":[\"products\"]}],\"editingLabel\":false,\"hideLabel\":true},{\"label\":\"New Section\",\"name\":\"section_WNOQ\",\"opened\":true,\"columns\":[{\"name\":\"column_ziBW\",\"fields\":[\"total\"]},{\"label\":\"\",\"name\":\"column_wuwA\",\"fields\":[\"net_total\"]}],\"hideBorder\":true,\"hideLabel\":true}]}]",
+  "modified": "2026-08-22 11:52:50.442337",
   "name": "CRM Deal-Data Fields",
   "type": "Data Fields"
  }
