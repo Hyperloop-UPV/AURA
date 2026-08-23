@@ -1,0 +1,90 @@
+[
+ {
+  "color": "yellow",
+  "deal_status": "Negotiation",
+  "docstatus": 0,
+  "doctype": "CRM Deal Status",
+  "modified": "2026-08-17 21:41:36.621036",
+  "name": "Negotiation",
+  "position": 4,
+  "probability": 70.0,
+  "type": "Ongoing"
+ },
+ {
+  "color": "blue",
+  "deal_status": "Contacted",
+  "docstatus": 0,
+  "doctype": "CRM Deal Status",
+  "modified": "2026-08-22 23:41:55.744154",
+  "name": "Contacted",
+  "position": 0,
+  "probability": 0.0,
+  "type": "Ongoing"
+ },
+ {
+  "color": "green",
+  "deal_status": "Partner",
+  "docstatus": 0,
+  "doctype": "CRM Deal Status",
+  "modified": "2026-08-22 23:42:39.880201",
+  "name": "Partner",
+  "position": 0,
+  "probability": 0.0,
+  "type": "Won"
+ },
+ {
+  "color": "teal",
+  "deal_status": "Renewal",
+  "docstatus": 0,
+  "doctype": "CRM Deal Status",
+  "modified": "2026-08-22 23:43:01.412410",
+  "name": "Renewal",
+  "position": 0,
+  "probability": 0.0,
+  "type": "Open"
+ },
+ {
+  "color": "gray",
+  "deal_status": "Inactive",
+  "docstatus": 0,
+  "doctype": "CRM Deal Status",
+  "modified": "2026-08-22 23:43:13.164821",
+  "name": "Inactive",
+  "position": 0,
+  "probability": 0.0,
+  "type": "On Hold"
+ },
+ {
+  "color": "red",
+  "deal_status": "No Response",
+  "docstatus": 0,
+  "doctype": "CRM Deal Status",
+  "modified": "2026-08-22 23:43:31.902046",
+  "name": "No Response",
+  "position": 0,
+  "probability": 0.0,
+  "type": "Lost"
+ },
+ {
+  "color": "purple",
+  "deal_status": "Not a Partner",
+  "docstatus": 0,
+  "doctype": "CRM Deal Status",
+  "modified": "2026-08-22 23:46:54.722217",
+  "name": "Not a Partner",
+  "position": 0,
+  "probability": 0.0,
+  "type": "Lost"
+ },
+ {
+  "color": "orange",
+  "deal_status": "Potential",
+  "docstatus": 0,
+  "doctype": "CRM Deal Status",
+  "modified": "2026-08-22 23:41:08.173440",
+  "name": "Potential",
+  "position": 0,
+  "probability": 0.0,
+  "type": "Open"
+ }
+]

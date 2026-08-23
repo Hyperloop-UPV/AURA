@@ -270,6 +270,25 @@ fixtures = [
         ],
     },
     {
+        "dt": "CRM Deal Status",
+        "filters": [
+            [
+                "name",
+                "in",
+                [
+                    "Potential",
+                    "Contacted",
+                    "Negotiation",
+                    "Partner",
+                    "Renewal",
+                    "Inactive",
+                    "No Response",
+                    "Not a Partner",
+                ],
+            ]
+        ],
+    },
+    {
         "dt": "CRM Fields Layout",
         "filters": [
             ["dt", "in", ["CRM Deal", "CRM Organization", "Contact", "CRM Task","CRM Products", "CRM Call Log"]]
