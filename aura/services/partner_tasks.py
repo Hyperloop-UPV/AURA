@@ -136,6 +136,10 @@ def create_partner_task(deal_name, template):
     - El título SIEMPRE empieza por [Nombre organización].
     - La tarea queda vinculada al CRM Deal.
     - Ventaja Partner queda marcada.
+    - Si ya existe para ese Deal una ventaja con el mismo título
+      que NO está Done, no se vuelve a crear.
+    - Si la tarea anterior está Done, se puede volver a crear.
+    - Si la tarea anterior fue eliminada, se puede volver a crear.
     """
 
     deal = frappe.get_doc(
@@ -165,6 +169,25 @@ def create_partner_task(deal_name, template):
         f"[{organization_name}] "
         f"{rendered_title}"
     ).strip()
+
+    # Evitar duplicados activos.
+    #
+    # Si ya existe una ventaja para este mismo Deal,
+    # con el mismo título, y NO está Done,
+    # no creamos otra.
+    existing_task = frappe.db.exists(
+        "CRM Task",
+        {
+            "reference_doctype": "CRM Deal",
+            "reference_docname": deal.name,
+            "title": title,
+            "custom_ventaja_partner": 1,
+            "status": ["!=", "Done"],
+        },
+    )
+
+    if existing_task:
+        return None
 
     task = frappe.get_doc({
         "doctype": "CRM Task",
@@ -196,12 +219,10 @@ def create_partner_tasks(deal_name):
     Crea todas las tareas correspondientes al Partner Tier
     de un Deal, incluyendo las tareas heredadas.
 
-    Ejemplo:
+    Solo devuelve las tareas que realmente se han creado.
 
-        Gold
-        ├── Collaborator tasks
-        ├── Silver tasks
-        └── Gold tasks
+    Si una ventaja equivalente ya existe y no está Done,
+    se ignora.
     """
 
     deal = frappe.get_doc(
@@ -225,34 +246,11 @@ def create_partner_tasks(deal_name):
             template,
         )
 
-        created_tasks.append(task)
+        if task:
+            created_tasks.append(task)
 
     return created_tasks
 
-
-def create_partner_tasks(deal_name):
-    """
-    Crea todas las tareas correspondientes al Partner Tier
-    de un Deal, incluyendo las tareas heredadas.
-    """
-
-    deal = frappe.get_doc("CRM Deal", deal_name)
-
-    tier_name = _get_partner_tier(deal)
-
-    templates = get_task_templates(tier_name)
-
-    created_tasks = []
-
-    for template in templates:
-        task = create_partner_task(
-            deal_name,
-            template,
-        )
-
-        created_tasks.append(task)
-
-    return created_tasks
 
 @frappe.whitelist()
 def generate_partner_tasks(deal_name):
@@ -264,7 +262,10 @@ def generate_partner_tasks(deal_name):
     pueda informar claramente al usuario.
     """
 
-    deal = frappe.get_doc("CRM Deal", deal_name)
+    deal = frappe.get_doc(
+        "CRM Deal",
+        deal_name,
+    )
 
     # El usuario debe poder acceder al Deal.
     deal.check_permission("read")
@@ -281,7 +282,10 @@ def generate_partner_tasks(deal_name):
 
     # Validación: Partner Tier
     try:
-        tier_name = _get_partner_tier(deal)
+        tier_name = _get_partner_tier(
+            deal
+        )
+
     except frappe.ValidationError:
         return {
             "success": False,
@@ -292,7 +296,9 @@ def generate_partner_tasks(deal_name):
         }
 
     # Validación: el tier tiene tareas
-    templates = get_task_templates(tier_name)
+    templates = get_task_templates(
+        tier_name
+    )
 
     if not templates:
         return {
@@ -304,19 +310,42 @@ def generate_partner_tasks(deal_name):
         }
 
     # Generación real
-    tasks = create_partner_tasks(deal_name)
+    tasks = create_partner_tasks(
+        deal_name
+    )
 
-    organization_name = _get_organization_name(deal)
+    organization_name = _get_organization_name(
+        deal
+    )
+
+    # Ninguna tarea nueva porque todas las ventajas
+    # ya tienen una tarea activa.
+    if not tasks:
+        return {
+            "success": True,
+            "message": (
+                f"No se han creado nuevas ventajas para "
+                f"{organization_name}: todas las ventajas del tier "
+                f"{tier_name} ya tienen una tarea activa."
+            ),
+            "created_count": 0,
+            "organization": organization_name,
+            "tier": tier_name,
+            "tasks": [],
+        }
 
     return {
         "success": True,
         "message": (
             f"Se han generado correctamente "
-            f"{len(tasks)} ventajas para "
+            f"{len(tasks)} nuevas ventajas para "
             f"{organization_name} ({tier_name})."
         ),
         "created_count": len(tasks),
         "organization": organization_name,
         "tier": tier_name,
-        "tasks": [task.name for task in tasks],
+        "tasks": [
+            task.name
+            for task in tasks
+        ],
     }
