@@ -1,0 +1,8 @@
+# Quarto source files in docs should be treated as source files,
+# not as documentation-only files and without assigning a Markdown label.
+docs/**/*.qmd linguist-detectable=true
+docs/**/*.qmd linguist-documentation=false
+
+# Apply the same rule to any other .qmd in the repo.
+*.qmd linguist-detectable=true
+*.qmd linguist-documentation=false
