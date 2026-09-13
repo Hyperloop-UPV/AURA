@@ -348,8 +348,10 @@ const OpportunityPartnerTier = () => {
     setErrorMessage(null);
 
     try {
+      const targetFilter = `targetOpportunityId[eq]:'${recordId}'`;
+
       const targetResponse = await client.get(
-        `/rest/taskTargets?opportunityId=${encodeURIComponent(recordId)}&limit=60`,
+        `/rest/taskTargets?filter=${encodeURIComponent(targetFilter)}&limit=60`,
       );
 
       const taskTargets = unwrapList(targetResponse, 'taskTargets');
@@ -405,20 +407,39 @@ const OpportunityPartnerTier = () => {
         };
 
         if (template.dueAt) taskPayload.dueAt = template.dueAt;
-
         const taskResponse = await client.post('/rest/tasks', taskPayload);
-        const taskId = extractCreatedId(taskResponse, 'task');
 
-        if (!taskId) throw new Error('Task created without an id');
+        console.log('AURA create task response:', taskResponse);
+
+        const taskRecord = unwrapOne(taskResponse, 'task');
+
+        console.log('AURA unwrapped task:', taskRecord);
+
+        const taskId =
+          getString(taskRecord, 'id') ??
+          (isRecord(taskRecord.createTask)
+            ? getString(taskRecord.createTask, 'id')
+            : null);
+
+        if (!taskId) {
+          console.error('AURA could not extract task id:', taskResponse);
+          throw new Error('Task created without an id');
+        }
 
         const targetPayload: JsonRecord = {
           taskId,
-          opportunityId: recordId,
+          targetOpportunityId: recordId,
         };
 
-        if (companyId) targetPayload.companyId = companyId;
-
         await client.post('/rest/taskTargets', targetPayload);
+
+        if (companyId) {
+          await client.post('/rest/taskTargets', {
+            taskId,
+            targetCompanyId: companyId,
+          });
+        }
+
         created += 1;
       }
 
@@ -629,8 +650,8 @@ const OpportunityPartnerTier = () => {
                   ...primaryButtonStyle,
                   opacity:
                     !selectedTierId ||
-                    inheritedTemplates.length === 0 ||
-                    isGenerating
+                      inheritedTemplates.length === 0 ||
+                      isGenerating
                       ? 0.45
                       : 1,
                 }}
