@@ -1,40 +1,34 @@
-### AURA
+# My Twenty App
 
-Advanced Unified Relations Application
+Describe your app in one or two sentences.
 
-### Installation
+## Features
 
-You can install this app using the [bench](https://github.com/frappe/bench) CLI:
+List the top things your app does, for example:
 
-```bash
-cd $PATH_TO_YOUR_BENCH
-bench get-app $URL_OF_THIS_REPO --branch version-16
-bench install-app aura
-```
+- Feature one
+- Feature two
+- Feature three
 
-### Contributing
+## Getting started
 
-This app uses `pre-commit` for code formatting and linting. Please [install pre-commit](https://pre-commit.com/#installation) and enable it for this repository:
+Setup instructions live in [SETUP.md](SETUP.md).
 
-```bash
-cd apps/aura
-pre-commit install
-```
+## Publishing
 
-Pre-commit is configured to use the following tools for checking and formatting your code:
+The `Publish` workflow (`.github/workflows/publish.yml`) publishes the app to npm with provenance using [npm trusted publishing](https://docs.npmjs.com/trusted-publishers). To publish:
 
-- ruff
-- eslint
-- prettier
-- pyupgrade
-### CI
+1. On npmjs.com register this repository as a trusted publisher of your package, pointing at the `publish.yml` workflow.
+2. Bump the version in `package.json`, then push a version tag (e.g. `git tag v1.0.0 && git push --tags`) or run the workflow manually from the Actions tab.
 
-This app can use GitHub Actions for CI. The following workflows are configured:
+Publishing with provenance is also how you prove ownership when claiming your app in a Twenty marketplace.
 
-- CI: Installs this app and runs unit tests on every push to `develop` branch.
-- Linters: Runs [Frappe Semgrep Rules](https://github.com/frappe/semgrep-rules) and [pip-audit](https://pypi.org/project/pip-audit/) on every pull request.
+## Changelog
 
+Notable changes are documented in [CHANGELOG.md](CHANGELOG.md).
 
-### License
+## Learn more
 
-mit
+- [Twenty Apps documentation](https://docs.twenty.com/developers/extend/apps/getting-started/quick-start)
+- [twenty-sdk CLI reference](https://www.npmjs.com/package/twenty-sdk)
+- [Discord](https://discord.gg/cx5n4Jzs57)
