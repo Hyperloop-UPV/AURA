@@ -21,6 +21,8 @@ type PartnerTier = {
 type Opportunity = {
   id: string;
   name: string;
+  companyId: string | null;
+  companyName: string | null;
   seasonId: string | null;
   partnerTierId: string | null;
 };
@@ -264,6 +266,8 @@ const normalizeOpportunity = (record: JsonRecord): Opportunity | null => {
   return {
     id,
     name: getString(record, 'name') ?? companyName ?? 'Opportunity',
+    companyId: relationId(record, 'companyId', 'company'),
+    companyName,
     seasonId: relationId(record, 'seasonId', 'season'),
     partnerTierId: relationId(record, 'partnerTierId', 'partnerTier'),
   };
@@ -367,6 +371,86 @@ const formatDate = (value: string | null): string => {
   });
 };
 
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+type DeadlineStyle = {
+  background: string;
+  border: string;
+  color: string;
+  label: string;
+  daysRemaining: number | null;
+};
+
+const getDeadlineStyle = (
+  dueAt: string | null,
+  completed: boolean,
+): DeadlineStyle => {
+  if (completed) {
+    return {
+      background: 'rgba(127,127,127,0.08)',
+      border: 'rgba(127,127,127,0.18)',
+      color: 'inherit',
+      label: 'Resuelta',
+      daysRemaining: null,
+    };
+  }
+
+  if (!dueAt) {
+    return {
+      background: 'rgba(127,127,127,0.06)',
+      border: 'rgba(127,127,127,0.16)',
+      color: 'inherit',
+      label: 'Sin fecha',
+      daysRemaining: null,
+    };
+  }
+
+  const due = new Date(dueAt);
+  if (Number.isNaN(due.getTime())) {
+    return {
+      background: 'rgba(127,127,127,0.06)',
+      border: 'rgba(127,127,127,0.16)',
+      color: 'inherit',
+      label: 'Sin fecha',
+      daysRemaining: null,
+    };
+  }
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  due.setHours(0, 0, 0, 0);
+
+  const daysRemaining = Math.ceil((due.getTime() - today.getTime()) / DAY_MS);
+
+  if (daysRemaining < 0) {
+    return {
+      background: 'hsl(0 72% 50% / 0.12)',
+      border: 'hsl(0 72% 50% / 0.34)',
+      color: 'hsl(0 72% 48%)',
+      label: `${Math.abs(daysRemaining)} d vencida`,
+      daysRemaining,
+    };
+  }
+
+  // 0 days = orange/red-orange; 30+ days = green. The hue moves
+  // continuously as the delivery date approaches.
+  const normalized = Math.min(daysRemaining, 30) / 30;
+  const hue = Math.round(18 + normalized * 102);
+
+  return {
+    background: `hsl(${hue} 68% 45% / 0.12)`,
+    border: `hsl(${hue} 68% 45% / 0.30)`,
+    color: `hsl(${hue} 62% 40%)`,
+    label:
+      daysRemaining === 0
+        ? 'Hoy'
+        : daysRemaining === 1
+          ? '1 día'
+          : `${daysRemaining} días`,
+    daysRemaining,
+  };
+};
+
 const PartnerAdvantages = () => {
   const client = useMemo(() => new RestApiClient(), []);
 
@@ -378,6 +462,10 @@ const PartnerAdvantages = () => {
   const [links, setLinks] = useState<TaskTargetLink[]>([]);
 
   const [selectedSeasonId, setSelectedSeasonId] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [collapsedOpportunityIds, setCollapsedOpportunityIds] = useState<Set<string>>(
+    () => new Set(),
+  );
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -428,11 +516,37 @@ const PartnerAdvantages = () => {
           .map(normalizeTask)
           .filter((task): task is PartnerTask => task !== null);
 
-        const loadedOpportunities = opportunityRecords
+        const loadedOpportunitiesBase = opportunityRecords
           .map(normalizeOpportunity)
           .filter(
             (opportunity): opportunity is Opportunity => opportunity !== null,
           );
+
+        const companyIds = loadedOpportunitiesBase
+          .map((opportunity) => opportunity.companyId)
+          .filter((id): id is string => id !== null);
+
+        const companyRecords = await fetchRecordsById(
+          client,
+          'companies',
+          companyIds,
+        );
+
+        const companyNameById = new Map<string, string>();
+        for (const company of companyRecords) {
+          const id = getString(company, 'id');
+          const name = getString(company, 'name');
+          if (id && name) companyNameById.set(id, name);
+        }
+
+        const loadedOpportunities = loadedOpportunitiesBase.map((opportunity) => ({
+          ...opportunity,
+          companyName:
+            opportunity.companyName ??
+            (opportunity.companyId
+              ? companyNameById.get(opportunity.companyId) ?? null
+              : null),
+        }));
 
         setSeasons(loadedSeasons);
         setTiers(loadedTiers);
@@ -669,28 +783,71 @@ const PartnerAdvantages = () => {
     0,
   );
 
+  const filteredGroups = useMemo<OpportunityTaskGroup[]>(() => {
+    const query = searchQuery.trim().toLocaleLowerCase();
+    if (!query) return groups;
+
+    const result: OpportunityTaskGroup[] = [];
+
+    for (const group of groups) {
+      const tierName = group.opportunity.partnerTierId
+        ? tierById.get(group.opportunity.partnerTierId)?.name ?? ''
+        : '';
+
+      const groupMatches = `${group.opportunity.companyName ?? ''} ${group.opportunity.name} ${tierName}`
+        .toLocaleLowerCase()
+        .includes(query);
+
+      const matchingTasks = group.tasks.filter((task) => {
+        const assigneeName =
+          task.assigneeName ??
+          (task.assigneeId
+            ? workspaceMemberById.get(task.assigneeId)?.name ?? ''
+            : 'Sin asignar');
+
+        return `${task.title} ${assigneeName}`
+          .toLocaleLowerCase()
+          .includes(query);
+      });
+
+      if (groupMatches) {
+        result.push(group);
+      } else if (matchingTasks.length > 0) {
+        result.push({ ...group, tasks: matchingTasks });
+      }
+    }
+
+    return result;
+  }, [groups, searchQuery, tierById, workspaceMemberById]);
+
+  const visibleTaskCount = filteredGroups.reduce(
+    (sum, group) => sum + group.tasks.length,
+    0,
+  );
+
   const shellStyle = {
     width: '100%',
     boxSizing: 'border-box' as const,
-    padding: '22px 24px 30px',
+    padding: '16px 18px 24px',
     fontFamily: 'sans-serif',
   };
 
   const cardStyle = {
-    border: '1px solid rgba(127,127,127,0.20)',
-    borderRadius: '10px',
+    border: '1px solid rgba(127,127,127,0.16)',
+    borderRadius: '9px',
     overflow: 'hidden',
-    background: 'rgba(127,127,127,0.025)',
+    background: 'rgba(127,127,127,0.018)',
+    boxShadow: '0 1px 2px rgba(0,0,0,0.03)',
   };
 
   const buttonStyle = {
-    border: '1px solid rgba(127,127,127,0.26)',
-    borderRadius: '6px',
-    padding: '7px 10px',
-    background: 'transparent',
+    border: '1px solid rgba(127,127,127,0.22)',
+    borderRadius: '7px',
+    padding: '6px 9px',
+    background: 'rgba(127,127,127,0.035)',
     color: 'inherit',
     cursor: 'pointer',
-    fontSize: '13px',
+    fontSize: '12px',
   };
 
   if (isLoading) {
@@ -699,112 +856,155 @@ const PartnerAdvantages = () => {
 
   return (
     <div style={shellStyle}>
+      <style>{`
+        .aura-pa-task-row:hover {
+          background: rgba(127,127,127,0.055);
+        }
+        .aura-pa-task-row:focus-visible {
+          outline: 2px solid rgba(127,127,127,0.45);
+          outline-offset: -2px;
+        }
+        .aura-pa-details[open] .aura-pa-chevron {
+          transform: rotate(180deg);
+        }
+        .aura-pa-chevron {
+          transition: transform 120ms ease;
+        }
+        @media (max-width: 760px) {
+          .aura-pa-task-grid {
+            grid-template-columns: 30px minmax(140px, 1fr) 110px !important;
+          }
+          .aura-pa-task-row > a {
+            grid-template-columns: minmax(140px, 1fr) 110px !important;
+          }
+          .aura-pa-assignee-column {
+            display: none !important;
+          }
+        }
+      `}</style>
+
       <div
         style={{
           display: 'flex',
           justifyContent: 'space-between',
-          gap: '16px',
-          alignItems: 'flex-end',
+          gap: '12px',
+          alignItems: 'center',
           flexWrap: 'wrap',
-          marginBottom: '18px',
+          marginBottom: '12px',
         }}
       >
         <div>
-          <div style={{ fontSize: '20px', fontWeight: 650 }}>
+          <div style={{ fontSize: '18px', fontWeight: 700 }}>
             Ventajas Partners
           </div>
-          <div style={{ marginTop: '4px', fontSize: '12px', opacity: 0.58 }}>
-            Partner tasks grouped by sponsorship.
+          <div style={{ marginTop: '2px', fontSize: '11px', opacity: 0.55 }}>
+            Seguimiento de entregas por patrocinio
           </div>
         </div>
 
-        <div>
-          <div
+        <div
+          style={{
+            display: 'flex',
+            gap: '7px',
+            alignItems: 'center',
+            flexWrap: 'wrap',
+          }}
+        >
+          <input
+            type="search"
+            value={searchQuery}
+            onChange={(event) => setSearchQuery(event.target.value)}
+            placeholder="Buscar tarea, partner o persona…"
+            aria-label="Buscar ventajas"
             style={{
-              marginBottom: '6px',
-              fontSize: '11px',
-              opacity: 0.58,
-              textAlign: 'right',
+              width: '250px',
+              maxWidth: '72vw',
+              minHeight: '32px',
+              border: '1px solid rgba(127,127,127,0.22)',
+              borderRadius: '7px',
+              padding: '6px 10px',
+              background: 'rgba(127,127,127,0.035)',
+              color: 'inherit',
+              fontSize: '12px',
+              outline: 'none',
+            }}
+          />
+
+          <button
+            type="button"
+            style={{
+              ...buttonStyle,
+              opacity:
+                selectedSeasonIndex >= 0 &&
+                selectedSeasonIndex < seasonOptions.length - 1
+                  ? 1
+                  : 0.35,
+            }}
+            disabled={
+              selectedSeasonIndex < 0 ||
+              selectedSeasonIndex >= seasonOptions.length - 1
+            }
+            onClick={() => {
+              const previous = seasonOptions[selectedSeasonIndex + 1];
+              if (previous) setSelectedSeasonId(previous.id);
+            }}
+            aria-label="Temporada anterior"
+          >
+            ‹
+          </button>
+
+          <select
+            value={selectedSeasonId}
+            onChange={(event) => setSelectedSeasonId(event.target.value)}
+            aria-label="Temporada"
+            style={{
+              minWidth: '132px',
+              minHeight: '32px',
+              border: '1px solid rgba(127,127,127,0.22)',
+              borderRadius: '7px',
+              padding: '5px 8px',
+              background: 'rgba(127,127,127,0.035)',
+              color: 'inherit',
+              fontSize: '12px',
             }}
           >
-            Season
-          </div>
+            {seasonOptions.length === 0 ? (
+              <option value="">No Seasons</option>
+            ) : null}
 
-          <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
-            <button
-              type="button"
-              style={{
-                ...buttonStyle,
-                opacity:
-                  selectedSeasonIndex >= 0 &&
-                  selectedSeasonIndex < seasonOptions.length - 1
-                    ? 1
-                    : 0.35,
-              }}
-              disabled={
-                selectedSeasonIndex < 0 ||
-                selectedSeasonIndex >= seasonOptions.length - 1
-              }
-              onClick={() => {
-                const previous = seasonOptions[selectedSeasonIndex + 1];
-                if (previous) setSelectedSeasonId(previous.id);
-              }}
-              aria-label="Previous season"
-            >
-              ‹
-            </button>
+            {seasonOptions.map((season) => (
+              <option key={season.id} value={season.id}>
+                {season.name}
+              </option>
+            ))}
+          </select>
 
-            <select
-              value={selectedSeasonId}
-              onChange={(event) => setSelectedSeasonId(event.target.value)}
-              style={{
-                minWidth: '150px',
-                minHeight: '34px',
-                border: '1px solid rgba(127,127,127,0.28)',
-                borderRadius: '6px',
-                padding: '6px 9px',
-                background: 'transparent',
-                color: 'inherit',
-                fontSize: '13px',
-              }}
-            >
-              {seasonOptions.length === 0 ? (
-                <option value="">No Seasons</option>
-              ) : null}
-
-              {seasonOptions.map((season) => (
-                <option key={season.id} value={season.id}>
-                  {season.name}
-                </option>
-              ))}
-            </select>
-
-            <button
-              type="button"
-              style={{
-                ...buttonStyle,
-                opacity: selectedSeasonIndex > 0 ? 1 : 0.35,
-              }}
-              disabled={selectedSeasonIndex <= 0}
-              onClick={() => {
-                const next = seasonOptions[selectedSeasonIndex - 1];
-                if (next) setSelectedSeasonId(next.id);
-              }}
-              aria-label="Next season"
-            >
-              ›
-            </button>
-          </div>
+          <button
+            type="button"
+            style={{
+              ...buttonStyle,
+              opacity: selectedSeasonIndex > 0 ? 1 : 0.35,
+            }}
+            disabled={selectedSeasonIndex <= 0}
+            onClick={() => {
+              const next = seasonOptions[selectedSeasonIndex - 1];
+              if (next) setSelectedSeasonId(next.id);
+            }}
+            aria-label="Temporada siguiente"
+          >
+            ›
+          </button>
         </div>
       </div>
 
       {errorMessage ? (
         <div
           style={{
-            marginBottom: '14px',
-            padding: '10px 12px',
-            border: '1px solid rgba(127,127,127,0.28)',
-            borderRadius: '8px',
+            marginBottom: '10px',
+            padding: '8px 10px',
+            border: '1px solid rgba(127,127,127,0.24)',
+            borderRadius: '7px',
+            fontSize: '12px',
           }}
         >
           {errorMessage}
@@ -817,25 +1017,23 @@ const PartnerAdvantages = () => {
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
-            gap: '12px',
-            marginBottom: '14px',
-            padding: '10px 12px',
-            border: '1px solid rgba(127,127,127,0.20)',
-            borderRadius: '8px',
-            fontSize: '12px',
+            gap: '10px',
+            marginBottom: '10px',
+            padding: '7px 9px',
+            border: '1px solid rgba(127,127,127,0.16)',
+            borderRadius: '7px',
+            fontSize: '11px',
           }}
         >
           <span>
-            {unassignedTaskCount} Partner task
-            {unassignedTaskCount === 1 ? '' : 's'} belong to sponsorships with no
-            Season assigned.
+            {unassignedTaskCount} ventaja{unassignedTaskCount === 1 ? '' : 's'} sin temporada asignada.
           </span>
           <button
             type="button"
             style={buttonStyle}
             onClick={() => setSelectedSeasonId(UNASSIGNED_SEASON_ID)}
           >
-            Show them
+            Ver
           </button>
         </div>
       ) : null}
@@ -843,72 +1041,144 @@ const PartnerAdvantages = () => {
       {selectedSeasonId && groups.length > 0 ? (
         <div
           style={{
-            marginBottom: '12px',
-            fontSize: '12px',
-            opacity: 0.62,
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px',
+            flexWrap: 'wrap',
+            marginBottom: '9px',
+            fontSize: '11px',
           }}
         >
-          {groups.length} sponsorship{groups.length === 1 ? '' : 's'} ·{' '}
-          {totalPending} pending task{totalPending === 1 ? '' : 's'}
+          <span
+            style={{
+              padding: '3px 7px',
+              borderRadius: '999px',
+              background: 'rgba(127,127,127,0.08)',
+            }}
+          >
+            {groups.length} patrocinio{groups.length === 1 ? '' : 's'}
+          </span>
+          <span
+            style={{
+              padding: '3px 7px',
+              borderRadius: '999px',
+              background: 'rgba(127,127,127,0.08)',
+            }}
+          >
+            {totalPending} pendiente{totalPending === 1 ? '' : 's'}
+          </span>
+          {searchQuery.trim() ? (
+            <span style={{ opacity: 0.58 }}>
+              {visibleTaskCount} resultado{visibleTaskCount === 1 ? '' : 's'}
+            </span>
+          ) : null}
         </div>
       ) : null}
 
       {!selectedSeasonId ? (
-        <div style={{ ...cardStyle, padding: '28px', textAlign: 'center' }}>
-          No Season is available.
+        <div style={{ ...cardStyle, padding: '24px', textAlign: 'center' }}>
+          No hay ninguna temporada disponible.
         </div>
-      ) : groups.length === 0 ? (
-        <div style={{ ...cardStyle, padding: '28px', textAlign: 'center' }}>
-          <div style={{ fontWeight: 600 }}>No Partner tasks for this Season</div>
-          <div style={{ marginTop: '5px', fontSize: '12px', opacity: 0.58 }}>
-            {tasks.length > 0
-              ? `${tasks.length} AURA Partner task${tasks.length === 1 ? '' : 's'} exist, but none belong to sponsorships in this Season.`
-              : 'No AURA Partner tasks were found.'}
+      ) : filteredGroups.length === 0 ? (
+        <div style={{ ...cardStyle, padding: '24px', textAlign: 'center' }}>
+          <div style={{ fontWeight: 600 }}>
+            {searchQuery.trim()
+              ? 'No hay resultados para esta búsqueda'
+              : 'No hay ventajas para esta temporada'}
+          </div>
+          <div style={{ marginTop: '4px', fontSize: '11px', opacity: 0.55 }}>
+            {searchQuery.trim()
+              ? 'Prueba con el nombre de una tarea, partner o persona asignada.'
+              : tasks.length > 0
+                ? `${tasks.length} ventaja${tasks.length === 1 ? '' : 's'} existen en AURA, pero ninguna pertenece a esta temporada.`
+                : 'No se han encontrado tareas generadas por AURA.'}
           </div>
         </div>
       ) : (
-        <div style={{ display: 'grid', gap: '12px' }}>
-          {groups.map((group) => {
+        <div style={{ display: 'grid', gap: '8px' }}>
+          {filteredGroups.map((group) => {
             const tierName = group.opportunity.partnerTierId
               ? tierById.get(group.opportunity.partnerTierId)?.name
               : null;
+            const groupDeadline = getDeadlineStyle(group.nextDueAt, group.pendingCount === 0);
 
             return (
               <details
                 key={group.opportunity.id}
+                className="aura-pa-details"
                 style={cardStyle}
-                open
+                open={
+                  searchQuery.trim() !== '' ||
+                  !collapsedOpportunityIds.has(group.opportunity.id)
+                }
+                onToggle={(event) => {
+                  if (searchQuery.trim() !== '') return;
+                  const isOpen = event.currentTarget.open;
+                  setCollapsedOpportunityIds((current) => {
+                    const next = new Set(current);
+                    if (isOpen) next.delete(group.opportunity.id);
+                    else next.add(group.opportunity.id);
+                    return next;
+                  });
+                }}
               >
                 <summary
                   style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    gap: '16px',
+                    display: 'grid',
+                    gridTemplateColumns: 'minmax(220px, 1fr) auto auto',
+                    gap: '10px',
                     alignItems: 'center',
-                    padding: '13px 15px',
+                    padding: '9px 11px',
                     cursor: 'pointer',
                     listStyle: 'none',
                   }}
                 >
-                  <div>
-                    <div style={{ fontSize: '14px', fontWeight: 650 }}>
-                      {group.opportunity.name}
-                      {tierName ? (
-                        <span style={{ fontWeight: 400, opacity: 0.58 }}>
-                          {' '}
-                          · {tierName}
-                        </span>
-                      ) : null}
-                    </div>
+                  <div style={{ minWidth: 0 }}>
                     <div
                       style={{
-                        marginTop: '3px',
-                        fontSize: '11px',
-                        opacity: 0.58,
+                        display: 'flex',
+                        alignItems: 'baseline',
+                        gap: '5px',
+                        minWidth: 0,
+                        overflow: 'hidden',
+                        whiteSpace: 'nowrap',
                       }}
                     >
-                      {group.pendingCount} pending · Next delivery:{' '}
-                      {formatDate(group.nextDueAt)}
+                      <span
+                        title={group.opportunity.companyName ?? 'Sin empresa'}
+                        style={{
+                          fontSize: '13px',
+                          fontWeight: 750,
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                        }}
+                      >
+                        {group.opportunity.companyName ?? 'Sin empresa'}
+                      </span>
+                      <span style={{ opacity: 0.35, flexShrink: 0 }}>·</span>
+                      <span
+                        title={group.opportunity.name}
+                        style={{
+                          fontSize: '12px',
+                          fontWeight: 600,
+                          opacity: 0.76,
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                        }}
+                      >
+                        {group.opportunity.name}
+                      </span>
+                      <span style={{ opacity: 0.35, flexShrink: 0 }}>·</span>
+                      <span
+                        style={{
+                          flexShrink: 0,
+                          fontSize: '11px',
+                          fontWeight: 650,
+                          opacity: 0.62,
+                        }}
+                      >
+                        {tierName ?? 'Sin tier'}
+                      </span>
                     </div>
                   </div>
 
@@ -916,59 +1186,106 @@ const PartnerAdvantages = () => {
                     style={{
                       display: 'flex',
                       alignItems: 'center',
-                      gap: '8px',
-                      fontSize: '12px',
-                      opacity: 0.55,
+                      gap: '7px',
+                      fontSize: '11px',
                     }}
                   >
-                    {group.tasks.length} task{group.tasks.length === 1 ? '' : 's'}
-                    <span aria-hidden="true">▾</span>
+                    <span style={{ opacity: 0.58 }}>
+                      {group.pendingCount} pendiente{group.pendingCount === 1 ? '' : 's'}
+                    </span>
+                    {group.nextDueAt ? (
+                      <span
+                        title={`Próxima entrega: ${formatDate(group.nextDueAt)} · ${groupDeadline.label}`}
+                        style={{
+                          padding: '3px 7px',
+                          borderRadius: '999px',
+                          border: `1px solid ${groupDeadline.border}`,
+                          background: groupDeadline.background,
+                          color: groupDeadline.color,
+                          fontWeight: 650,
+                          whiteSpace: 'nowrap',
+                        }}
+                      >
+                        {formatDate(group.nextDueAt)}
+                      </span>
+                    ) : null}
                   </div>
+
+                  <span
+                    className="aura-pa-chevron"
+                    aria-hidden="true"
+                    style={{ fontSize: '12px', opacity: 0.45 }}
+                  >
+                    ▾
+                  </span>
                 </summary>
 
-                <div
-                  style={{
-                    borderTop: '1px solid rgba(127,127,127,0.15)',
-                  }}
-                >
+                <div style={{ borderTop: '1px solid rgba(127,127,127,0.12)' }}>
+                  <div
+                    className="aura-pa-task-grid"
+                    style={{
+                      display: 'grid',
+                      gridTemplateColumns: '30px minmax(220px, 1fr) minmax(135px, 180px) 128px',
+                      gap: '8px',
+                      alignItems: 'center',
+                      padding: '6px 11px',
+                      background: 'rgba(127,127,127,0.025)',
+                      borderBottom: '1px solid rgba(127,127,127,0.10)',
+                      fontSize: '10px',
+                      fontWeight: 650,
+                      opacity: 0.54,
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.03em',
+                    }}
+                  >
+                    <span />
+                    <span>Tarea</span>
+                    <span className="aura-pa-assignee-column">Persona asignada</span>
+                    <span style={{ textAlign: 'right' }}>Entrega</span>
+                  </div>
+
                   {group.tasks.map((task, index) => {
                     const completed = isTaskCompleted(task);
-                    const dueTime = toTime(task.dueAt);
-                    const isOverdue =
-                      !completed && dueTime !== null && dueTime < Date.now();
                     const isUpdating = updatingTaskIds.has(task.id);
                     const assigneeName =
                       task.assigneeName ??
                       (task.assigneeId
                         ? workspaceMemberById.get(task.assigneeId)?.name ??
-                          'Assigned member'
-                        : 'Unassigned');
+                          'Miembro asignado'
+                        : 'Sin asignar');
+                    const deadline = getDeadlineStyle(task.dueAt, completed);
 
                     return (
                       <div
                         key={task.id}
+                        className="aura-pa-task-row"
                         style={{
                           display: 'grid',
-                          gridTemplateColumns: '34px minmax(220px, 1fr) 180px 125px',
-                          gap: '10px',
+                          gridTemplateColumns: '30px minmax(0, 1fr)',
+                          gap: '8px',
                           alignItems: 'center',
-                          padding: '10px 15px',
+                          padding: '7px 11px',
                           borderBottom:
                             index === group.tasks.length - 1
                               ? undefined
-                              : '1px solid rgba(127,127,127,0.10)',
+                              : '1px solid rgba(127,127,127,0.08)',
+                          transition: 'background 100ms ease',
                         }}
                       >
                         <button
                           type="button"
-                          onClick={() => void setTaskCompleted(task, !completed)}
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            void setTaskCompleted(task, !completed);
+                          }}
+                          onKeyDown={(event) => event.stopPropagation()}
                           disabled={isUpdating}
-                          title={completed ? 'Reopen task' : 'Mark as resolved'}
-                          aria-label={completed ? 'Reopen task' : 'Mark as resolved'}
+                          title={completed ? 'Reabrir tarea' : 'Marcar como resuelta'}
+                          aria-label={completed ? 'Reabrir tarea' : 'Marcar como resuelta'}
                           style={{
-                            width: '26px',
-                            height: '26px',
-                            border: '1px solid rgba(127,127,127,0.28)',
+                            width: '22px',
+                            height: '22px',
+                            border: '1px solid rgba(127,127,127,0.26)',
                             borderRadius: '6px',
                             background: completed
                               ? 'rgba(127,127,127,0.14)'
@@ -976,47 +1293,79 @@ const PartnerAdvantages = () => {
                             color: 'inherit',
                             cursor: isUpdating ? 'wait' : 'pointer',
                             opacity: isUpdating ? 0.45 : completed ? 0.62 : 1,
-                            fontSize: '14px',
+                            fontSize: '12px',
                             lineHeight: 1,
                           }}
                         >
                           {completed ? '✓' : ''}
                         </button>
 
-                        <div
+                        <a
+                          href={`/object/task/${encodeURIComponent(task.id)}`}
+                          title="Abrir tarea en Twenty"
                           style={{
-                            fontSize: '13px',
-                            opacity: completed ? 0.48 : 1,
-                            textDecoration: completed ? 'line-through' : 'none',
+                            display: 'grid',
+                            gridTemplateColumns: 'minmax(220px, 1fr) minmax(135px, 180px) 128px',
+                            gap: '8px',
+                            alignItems: 'center',
+                            minWidth: 0,
+                            color: 'inherit',
+                            textDecoration: 'none',
+                            cursor: 'pointer',
                           }}
                         >
-                          {task.title}
-                        </div>
+                          <div
+                            style={{
+                              minWidth: 0,
+                              fontSize: '12px',
+                              opacity: completed ? 0.45 : 0.94,
+                              textDecoration: completed ? 'line-through' : 'none',
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                              whiteSpace: 'nowrap',
+                            }}
+                          >
+                            {task.title}
+                          </div>
 
-                        <div
-                          style={{
-                            fontSize: '11px',
-                            opacity: completed ? 0.42 : 0.62,
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis',
-                            whiteSpace: 'nowrap',
-                          }}
-                          title={assigneeName}
-                        >
-                          {assigneeName}
-                        </div>
+                          <div
+                            className="aura-pa-assignee-column"
+                            title={assigneeName}
+                            style={{
+                              minWidth: 0,
+                              fontSize: '11px',
+                              opacity: completed ? 0.40 : 0.66,
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                              whiteSpace: 'nowrap',
+                            }}
+                          >
+                            {assigneeName}
+                          </div>
 
-                        <div
-                          style={{
-                            textAlign: 'right',
-                            fontSize: '11px',
-                            opacity: completed ? 0.42 : isOverdue ? 1 : 0.6,
-                            fontWeight: isOverdue ? 650 : 400,
-                          }}
-                        >
-                          {formatDate(task.dueAt)}
-                          {isOverdue ? ' · Overdue' : ''}
-                        </div>
+                          <div style={{ textAlign: 'right' }}>
+                            <span
+                              title={`${formatDate(task.dueAt)} · ${deadline.label}`}
+                              style={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                maxWidth: '100%',
+                                padding: '3px 7px',
+                                borderRadius: '999px',
+                                border: `1px solid ${deadline.border}`,
+                                background: deadline.background,
+                                color: deadline.color,
+                                fontSize: '10px',
+                                fontWeight: 650,
+                                whiteSpace: 'nowrap',
+                                opacity: completed ? 0.55 : 1,
+                              }}
+                            >
+                              {formatDate(task.dueAt)}
+                            </span>
+                          </div>
+                        </a>
                       </div>
                     );
                   })}
@@ -1035,6 +1384,6 @@ export default defineFrontComponent({
     PARTNER_ADVANTAGES_FRONT_COMPONENT_UNIVERSAL_IDENTIFIER,
   name: 'partner-advantages',
   description:
-    'AURA Partner tasks grouped by Opportunity, with assignee and inline completion.',
+    'Compact AURA Partner advantages view with search, assignee, urgency and native Task navigation.',
   component: PartnerAdvantages,
 });
