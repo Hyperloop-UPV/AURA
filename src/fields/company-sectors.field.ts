@@ -4,23 +4,24 @@ import {
   STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS,
 } from 'twenty-sdk/define';
 
-export const COMPANY_SECTOR_FIELD_UNIVERSAL_IDENTIFIER =
-  'd54dd493-df91-476d-9461-47022a1589ee';
+export const COMPANY_SECTORES_FIELD_UNIVERSAL_IDENTIFIER =
+  '6f4b6178-1b55-4d6f-9a44-a32a3127eb51';
 
 export default defineField({
-  universalIdentifier: COMPANY_SECTOR_FIELD_UNIVERSAL_IDENTIFIER,
+  universalIdentifier: COMPANY_SECTORES_FIELD_UNIVERSAL_IDENTIFIER,
 
   objectUniversalIdentifier:
     STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.company.universalIdentifier,
 
-  type: FieldType.SELECT,
+  type: FieldType.MULTI_SELECT,
 
-  name: 'sector',
-  label: 'Sector',
+  name: 'sectores',
+  label: 'Sectores',
 
   description:
-    'Sector principal de actividad de la organización.',
+    'Sectores de actividad de la organización.',
   icon: 'IconCategory',
+
   options: [
     {
       value: 'ELECTROMAGNETICS',
